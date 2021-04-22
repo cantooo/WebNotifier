@@ -7,9 +7,12 @@
 
 import SwiftUI
 
+let userDefaults = UserDefaults.standard
+let urlsKey = "WebNotifierUrls"
+
 struct ContentView: View {
     @State var input:String = ""
-    @State var urls:[String] = []
+    @State var urls:[String] = userDefaults.object(forKey: urlsKey) as? [String] ?? []
     
     var body: some View {
         NavigationView(content: {
@@ -20,6 +23,7 @@ struct ContentView: View {
                         let url = input.trimmingCharacters(in: .whitespacesAndNewlines)
                         if !url.isEmpty {
                             urls.append(url)
+                            userDefaults.set(urls, forKey: urlsKey)
                         }
                         input = ""
                     }
@@ -30,6 +34,7 @@ struct ContentView: View {
                             Text(e)
                         }.onDelete(perform: { indexSet in
                             urls.remove(atOffsets: indexSet)
+                            userDefaults.set(urls, forKey: urlsKey)
                         })
                     }
                 }
