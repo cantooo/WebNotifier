@@ -7,14 +7,9 @@
 
 import SwiftUI
 
-struct Url: Hashable {
-    var url:String
-    var id = UUID()
-}
-
 struct ContentView: View {
     @State var input:String = ""
-    @State var urls:[Url] = []
+    @State var urls:[String] = []
     
     var body: some View {
         NavigationView(content: {
@@ -22,8 +17,9 @@ struct ContentView: View {
                 Section(header: Text("INSERIMENTO")) {
                     TextField("URL da controllare", text: $input)
                     Button("Inizia a controllare") {
-                        if !input.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                            urls.append(Url(url: input))
+                        let url = input.trimmingCharacters(in: .whitespacesAndNewlines)
+                        if !url.isEmpty {
+                            urls.append(url)
                         }
                         input = ""
                     }
@@ -31,7 +27,7 @@ struct ContentView: View {
                 Section(header: Text("CONTROLLO IN CORSO")) {
                     List{
                         ForEach(urls, id: \.self) { e in
-                            Text(e.url)
+                            Text(e)
                         }.onDelete(perform: { indexSet in
                             urls.remove(atOffsets: indexSet)
                         })
