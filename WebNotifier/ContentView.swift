@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct Url: Identifiable, Hashable {
+struct Url: Hashable {
     var url:String
     var id = UUID()
 }
@@ -22,7 +22,9 @@ struct ContentView: View {
                 Section(header: Text("INSERIMENTO")) {
                     TextField("URL da controllare", text: $input)
                     Button("Inizia a controllare") {
-                        urls.append(Url(url: input))
+                        if !input.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            urls.append(Url(url: input))
+                        }
                         input = ""
                     }
                 }
