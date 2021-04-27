@@ -13,8 +13,8 @@ let htmlsKey = "WebNotifierHTMLs"
 
 struct ContentView: View {
     @State var input = ""
-    @State var urls:[String] = userDefaults.object(forKey: urlsKey) as? [String] ?? []
-    @State var htmls:[String] = userDefaults.object(forKey: htmlsKey) as? [String] ?? []
+    @State var urls:[String] = userDefaults.stringArray(forKey: urlsKey) ?? []
+    @State var htmls:[String] = userDefaults.stringArray(forKey: htmlsKey) ?? []
     @State var incorrectUrlAlert = false
     @State var changedUrlAlert = false
     @State var changedUrl = ""
@@ -52,6 +52,15 @@ struct ContentView: View {
                     List{
                         ForEach(urls, id: \.self) { e in
                             Text(e)
+                                .contextMenu {
+                                    Button {
+                                        if let url = URL(string: e) {
+                                            UIApplication.shared.open(url)
+                                        }
+                                    } label: {
+                                        Label("Apri", systemImage: "safari")
+                                    }
+                                }
                         }.onDelete(perform: { indexSet in
                             urls.remove(atOffsets: indexSet)
                             userDefaults.set(urls, forKey: urlsKey)
