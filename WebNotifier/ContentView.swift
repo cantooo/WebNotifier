@@ -111,8 +111,10 @@ struct ContentView: View {
             }
         }
         
-        changedUrl.popLast()
-        changedUrl.popLast()
+        if changedUrl != "" {
+            changedUrl.popLast()
+            changedUrl.popLast()
+        }
     }
 }
 
