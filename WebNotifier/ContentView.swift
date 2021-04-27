@@ -9,11 +9,15 @@ import SwiftUI
 
 let userDefaults = UserDefaults.standard
 let urlsKey = "WebNotifierUrls"
+let htmlsKey = "WebNotifierHTMLs"
 
 struct ContentView: View {
-    @State var input:String = ""
+    @State var input = ""
     @State var urls:[String] = userDefaults.object(forKey: urlsKey) as? [String] ?? []
-    @State var alert = false
+    @State var htmls:[String] = userDefaults.object(forKey: htmlsKey) as? [String] ?? []
+    @State var incorrectUrlAlert = false
+    @State var changedUrlAlert = false
+    @State var changedUrl = ""
     
     var body: some View {
         NavigationView(content: {
@@ -24,25 +28,35 @@ struct ContentView: View {
                         let url = input.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
                         
                         if !url.isEmpty {
-                            if !checkWebpage(at: url) {
-                                alert.toggle()
+                            let html = fetchHTML(at: url) ?? ""
+                            if html == "" {
+                                incorrectUrlAlert.toggle()
                             } else {
                                 urls.append(url)
                                 userDefaults.set(urls, forKey: urlsKey)
+                                htmls.append(html)
+                                userDefaults.set(htmls, forKey: htmlsKey)
                             }
                         }
                         input = ""
-                    }.alert(isPresented: $alert) {
+                    }.alert(isPresented: $incorrectUrlAlert) {
                         Alert(title: Text("URL errato"), message: Text("L'URL fornito non sembra corrispondere a un URL valido."), dismissButton: .default(Text("Ok")))
                     }
                 }
                 Section(header: Text("CONTROLLO IN CORSO")) {
+                    Button("Controlla modifiche") {
+                        checkChangesInApp()
+                    }.alert(isPresented: $changedUrlAlert, content: {
+                        Alert(title: Text("La pagina è cambiata"), message: Text("La pagina \(changedUrl) è cambiata."), dismissButton: .default(Text("Ok")))
+                    })
                     List{
                         ForEach(urls, id: \.self) { e in
                             Text(e)
                         }.onDelete(perform: { indexSet in
                             urls.remove(atOffsets: indexSet)
                             userDefaults.set(urls, forKey: urlsKey)
+                            htmls.remove(atOffsets: indexSet)
+                            userDefaults.set(htmls, forKey: htmlsKey)
                         })
                     }
                 }
@@ -51,22 +65,12 @@ struct ContentView: View {
         })
     }
     
-    func checkWebpage (at url:String)->Bool {
-        let html = fetchHTML(at: url) ?? ""
-        
-        if html != "" {
-            return true
-        }
-        
-        return false
-    }
-    
 //  Fetches the HTML of the webpage at the given url
     func fetchHTML (at url: String)->String? {
         var html = ""
         
         do {
-            html = try String(contentsOf: URL(string: url)!, encoding: .ascii)
+            html = try String(contentsOf: URL(string: url)!)
         } catch let error {
             print(error.localizedDescription)
             print("Non sono riuscito a caricare la pagina", url, ".")
@@ -74,6 +78,32 @@ struct ContentView: View {
         }
         
         return html
+    }
+    
+//  Fetches every HTML of every URL and checkes for changes, appearing as an inapp Alert
+//  Need to find a solution for dynamic webpages
+    func checkChangesInApp() {
+        changedUrl = ""
+        
+        for i in 0..<urls.count {
+            let url = urls[i]
+            let htmlNew = fetchHTML(at: url) ?? ""
+            let htmlOld = htmls[i]
+            
+            if htmlNew != "" && htmlNew != htmlOld {
+                htmls[i] = htmlNew
+                userDefaults.set(htmls, forKey: htmlsKey)
+                
+                if !changedUrlAlert {
+                    changedUrlAlert.toggle()
+                }
+                
+                changedUrl += "\(url), "
+            }
+        }
+        
+        changedUrl.popLast()
+        changedUrl.popLast()
     }
 }
 
