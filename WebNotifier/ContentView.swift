@@ -29,7 +29,7 @@ struct ContentView: View {
     @State var incorrectUrlAlert = false
 //  Changed URL Alert trigger
     @State var changedUrlAlert = false
-//  The changed URL or URLs
+//  The changed URL or URLs trigger
     @State var changedUrl = ""
     
 //  Hides the keyboard. There is no native way of doing this, unless like this
