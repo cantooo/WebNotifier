@@ -170,7 +170,7 @@ struct ContentView: View {
                         input = ""
                     }.alert(isPresented: $incorrectUrlAlert) {
 //                      Incorrect URL Alert
-                        Alert(title: Text("URL errato"), message: Text("L'URL fornito non sembra corrispondere a un URL valido."), dismissButton: .default(Text("Ok")))
+                        Alert(title: Text("URL errato"), message: Text("L'URL fornito non sembra corrispondere a un URL valido. Controlla che l'URL sia giusto e che tu sia connesso a internet."), dismissButton: .default(Text("Ok")))
                     }
                 }
 //              Second section
