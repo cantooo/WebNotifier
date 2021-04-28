@@ -80,8 +80,8 @@ struct ContentView: View {
         return html
     }
     
-//  Fetches every HTML of every URL and checkes for changes, appearing as an inapp Alert
-//  Need to find a solution for dynamic webpages
+//  Fetches every HTML of every URL and checkes for changes, appearing as an inapp Alert.
+//  Dynamic webpages will always appear as changed, because of several changing session-unique IDs when fetching
     func checkChangesInApp() {
         changedUrl = ""
         
