@@ -36,8 +36,10 @@ struct ContentView: View {
     
 //  Tries to add the given URL into the List
     func addURL() {
-//  Formats the URL trimming whitespaces and lowercases it
+//      Formats the URL trimming whitespaces and lowercases it
         let url = input.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+//      Resets the URL TextField
+        input = ""
         
 //      If the URL is correctly given
         if !url.isEmpty {
