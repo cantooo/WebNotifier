@@ -29,6 +29,110 @@ struct ContentView: View {
 //  The changed URL or URLs
     @State var changedUrl = ""
     
+//  Hides the keyboard. There is no native way of doing this, unless like this
+    func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+    
+//  Tries to add the given URL into the List
+    func addURL() {
+//  Formats the URL trimming whitespaces and lowercases it
+        let url = input.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        
+//      If the URL is correctly given
+        if !url.isEmpty {
+//          Fetch the HTML at the given url. If it returns `nil`, default value is ""
+            let html = fetchHTML(at: url) ?? ""
+//          If the URL is incorrect (the fetch returned `nil`)
+            if html == "" {
+//              Show the incorrect URL Alert
+                incorrectUrlAlert.toggle()
+            } else {
+//              Add the URL to the list of saved URLs and synchronize storage
+                urls.append(url)
+                userDefaults.set(urls, forKey: urlsKey)
+//              Add the HTML to the list of fetched HTMLs and synchronize storage
+                htmls.append(html)
+                userDefaults.set(htmls, forKey: htmlsKey)
+            }
+        }
+    }
+    
+//  Fetches the HTML of the webpage at the given url
+    func fetchHTML (at url: String)->String? {
+        var html = ""
+        
+//      Tries to fetch the HTML at the given URL
+        do {
+            html = try String(contentsOf: URL(string: url)!)
+        } catch let error {
+//          If an error is found it returns `nil`
+            print(error.localizedDescription)
+            print("Non sono riuscito a caricare la pagina", url, ".")
+            return nil
+        }
+        
+        return html
+    }
+    
+//  Fetches every HTML of every URL and checkes for changes, appearing as an inapp Alert
+//  Need to find a solution for dynamic webpages
+    func checkChangesInApp() {
+        changedUrl = ""
+        
+//      For every element in urls
+        for i in 0..<urls.count {
+//          Sets the url
+            let url = urls[i]
+//          Sets the old HTML
+            let htmlOld = htmls[i]
+//          Fetch the HTML of the page
+            let htmlNew = fetchHTML(at: url) ?? ""
+            
+//          If the fetch did happen correctly and the webpage is changed
+            if htmlNew != "" && htmlNew != htmlOld {
+//              Saves the new HTML and synchronize storage
+                htmls[i] = htmlNew
+                userDefaults.set(htmls, forKey: htmlsKey)
+                
+//              If not already set to `true`, show the changed URL Alert
+                if !changedUrlAlert {
+                    changedUrlAlert.toggle()
+                }
+                
+//              Adds this url to list of URLs that changed
+                changedUrl += "\(url), "
+            }
+        }
+        
+//      If there is at least 1 changed URL, eliminates the ", " string at the end
+        if changedUrl != "" {
+            changedUrl.popLast()
+            changedUrl.popLast()
+        }
+    }
+    
+    func checkChanges() {
+//      For every element in urls
+        for i in 0..<urls.count {
+//          Sets the url
+            let url = urls[i]
+//          Sets the old HTML
+            let htmlOld = htmls[i]
+//          Fetch the HTML of the page
+            let htmlNew = fetchHTML(at: url) ?? ""
+            
+//          If the fetch did happen correctly and the webpage is changed
+            if htmlNew != "" && htmlNew != htmlOld {
+//              Saves the new HTML and synchronize storage
+                htmls[i] = htmlNew
+                userDefaults.set(htmls, forKey: htmlsKey)
+                
+                //NOTIFICA
+            }
+        }
+    }
+    
     var body: some View {
 //      For the bold title
         NavigationView(content: {
@@ -116,65 +220,6 @@ struct ContentView: View {
 //          Bold title on top
             .navigationTitle("WebNotifier")
         })
-    }
-    
-//  Fetches the HTML of the webpage at the given url
-    func fetchHTML (at url: String)->String? {
-        var html = ""
-        
-//      Tries to fetch the HTML at the given URL
-        do {
-            html = try String(contentsOf: URL(string: url)!)
-        } catch let error {
-//          If an error is found it returns `nil`
-            print(error.localizedDescription)
-            print("Non sono riuscito a caricare la pagina", url, ".")
-            return nil
-        }
-        
-        return html
-    }
-    
-//  Fetches every HTML of every URL and checkes for changes, appearing as an inapp Alert
-//  Need to find a solution for dynamic webpages
-    func checkChangesInApp() {
-        changedUrl = ""
-        
-//      For every element in urls
-        for i in 0..<urls.count {
-//          Sets the url
-            let url = urls[i]
-//          Sets the old HTML
-            let htmlOld = htmls[i]
-//          Fetch the HTML of the page
-            let htmlNew = fetchHTML(at: url) ?? ""
-            
-//          If the fetch did happen correctly and the webpage is changed
-            if htmlNew != "" && htmlNew != htmlOld {
-//              Saves the new HTML and synchronize storage
-                htmls[i] = htmlNew
-                userDefaults.set(htmls, forKey: htmlsKey)
-                
-//              If not already set to `true`, show the changed URL Alert
-                if !changedUrlAlert {
-                    changedUrlAlert.toggle()
-                }
-                
-//              Adds this url to list of URLs that changed
-                changedUrl += "\(url), "
-            }
-        }
-        
-//      If there is at least 1 changed URL, eliminates the ", " string at the end
-        if changedUrl != "" {
-            changedUrl.popLast()
-            changedUrl.popLast()
-        }
-    }
-    
-//  Hides the keyboard. There is no native way of doing this, unless like this
-    func hideKeyboard() {
-        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
 
