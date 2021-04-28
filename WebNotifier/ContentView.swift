@@ -155,15 +155,16 @@ struct ContentView: View {
                 Section(header: Text("INSERIMENTO")) {
 //                  URL TextField
                     TextField("URL da controllare", text: $input).disableAutocorrection(true)
+                        .alert(isPresented: $incorrectUrlAlert) {
+//                          Incorrect URL Alert
+                            Alert(title: Text("URL errato"), message: Text("L'URL fornito non sembra corrispondere a un URL valido. Controlla che l'URL sia giusto e che tu sia connesso a internet."), dismissButton: .default(Text("Ok")))
+                        }
                     Button("Inizia a controllare") {
 //                      Hides the keyboard
                         hideKeyboard()
                         
 //                      Tries to add the given URL into the List
                         operationQueue.addOperation {self.addURL()}
-                    }.alert(isPresented: $incorrectUrlAlert) {
-//                      Incorrect URL Alert
-                        Alert(title: Text("URL errato"), message: Text("L'URL fornito non sembra corrispondere a un URL valido. Controlla che l'URL sia giusto e che tu sia connesso a internet."), dismissButton: .default(Text("Ok")))
                     }.alert(isPresented: $URLAlreadyInListAlert) {
                         Alert(title: Text("URL già inserito"), message: Text("L'URL fornito è già nella lista."), dismissButton: .default(Text("Ok")))
                     }
