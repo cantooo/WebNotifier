@@ -12,6 +12,9 @@ let userDefaults = UserDefaults.standard
 let urlsKey = "WebNotifierUrls"
 let htmlsKey = "WebNotifierHTMLs"
 
+//  Clipboard functionality for copying URLs in list
+let pasteboard = UIPasteboard.general
+
 struct ContentView: View {
 //  URL TextField
     @State var input = ""
@@ -34,8 +37,11 @@ struct ContentView: View {
 //              First section
                 Section(header: Text("INSERIMENTO")) {
 //                  URL TextField
-                    TextField("URL da controllare", text: $input)
+                    TextField("URL da controllare", text: $input).disableAutocorrection(true)
                     Button("Inizia a controllare") {
+//                      Hides the keyboard
+                        hideKeyboard()
+                        
 //                      Formats the URL trimming whitespaces and lowercases it
                         let url = input.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
                         
@@ -75,19 +81,24 @@ struct ContentView: View {
 //                  List of all stored URLs
                     List{
 //                      For each URL in `urls` array
-                        ForEach(urls, id: \.self) { e in
+                        ForEach(urls, id: \.self) { url in
 //                          List item with the url
-                            Text(e)
+                            Text(url)
 //                              Context menu (long press)
                                 .contextMenu {
                                     Button {
 //                                      Tries to open the url into the default browser
-                                        if let url = URL(string: e) {
+                                        if let url = URL(string: url) {
                                             UIApplication.shared.open(url)
                                         }
                                     } label: {
 //                                      Button text with icon
                                         Label("Apri", systemImage: "safari")
+                                    }
+                                    Button {
+                                        pasteboard.string = url
+                                    } label: {
+                                        Label("Copia", systemImage: "doc.on.doc")
                                     }
                                 }
 //                      Slide to the left to delete an element
@@ -159,6 +170,11 @@ struct ContentView: View {
             changedUrl.popLast()
             changedUrl.popLast()
         }
+    }
+    
+//  Hides the keyboard. There is no native way of doing this, unless like this
+    func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
 
