@@ -22,9 +22,9 @@ struct ContentView: View {
 //  URL TextField
     @State var input = ""
 //  URLs saved in storage
-    @State var urls:[String] = userDefaults.stringArray(forKey: urlsKey) ?? []
+    @State var urls = userDefaults.stringArray(forKey: urlsKey) ?? []
 //  HTMLs saved in storage
-    @State var htmls:[String] = userDefaults.stringArray(forKey: htmlsKey) ?? []
+    @State var htmls = userDefaults.stringArray(forKey: htmlsKey) ?? []
 //  Incorrect URL Alert trigger
     @State var incorrectUrlAlert = false
 //  URL already in List trigger
