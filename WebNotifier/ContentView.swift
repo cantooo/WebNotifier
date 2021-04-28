@@ -27,6 +27,8 @@ struct ContentView: View {
     @State var htmls:[String] = userDefaults.stringArray(forKey: htmlsKey) ?? []
 //  Incorrect URL Alert trigger
     @State var incorrectUrlAlert = false
+//  URL already in List trigger
+    @State var URLAlreadyInListAlert = false
 //  Changed URL Alert trigger
     @State var changedUrlAlert = false
 //  The changed URL or URLs trigger
@@ -46,19 +48,25 @@ struct ContentView: View {
         
 //      If the URL is correctly given
         if !url.isEmpty {
-//          Fetch the HTML at the given url. If it returns `nil`, default value is ""
-            let html = fetchHTML(at: url) ?? ""
-//          If the URL is incorrect (the fetch returned `nil`)
-            if html == "" {
-//              Show the incorrect URL Alert
-                incorrectUrlAlert.toggle()
+//          If the given URL is not already in List
+            if !urls.contains(url) {
+//              Fetch the HTML at the given url. If it returns `nil`, default value is ""
+                let html = fetchHTML(at: url) ?? ""
+//              If the URL is incorrect (the fetch returned `nil`)
+                if html == "" {
+//                  Show the incorrect URL Alert
+                    incorrectUrlAlert.toggle()
+                } else {
+//                  Add the URL to the list of saved URLs and synchronize storage
+                    urls.append(url)
+                    userDefaults.set(urls, forKey: urlsKey)
+//                  Add the HTML to the list of fetched HTMLs and synchronize storage
+                    htmls.append(html)
+                    userDefaults.set(htmls, forKey: htmlsKey)
+                }
             } else {
-//              Add the URL to the list of saved URLs and synchronize storage
-                urls.append(url)
-                userDefaults.set(urls, forKey: urlsKey)
-//              Add the HTML to the list of fetched HTMLs and synchronize storage
-                htmls.append(html)
-                userDefaults.set(htmls, forKey: htmlsKey)
+//              Show the URL already in List Alert
+                URLAlreadyInListAlert.toggle()
             }
         }
     }
@@ -156,6 +164,8 @@ struct ContentView: View {
                     }.alert(isPresented: $incorrectUrlAlert) {
 //                      Incorrect URL Alert
                         Alert(title: Text("URL errato"), message: Text("L'URL fornito non sembra corrispondere a un URL valido. Controlla che l'URL sia giusto e che tu sia connesso a internet."), dismissButton: .default(Text("Ok")))
+                    }.alert(isPresented: $URLAlreadyInListAlert) {
+                        Alert(title: Text("URL già inserito"), message: Text("L'URL fornito è già nella lista."), dismissButton: .default(Text("Ok")))
                     }
                 }
 //              Second section
