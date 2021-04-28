@@ -15,6 +15,9 @@ let htmlsKey = "WebNotifierHTMLs"
 //  Clipboard functionality for copying URLs in list
 let pasteboard = UIPasteboard.general
 
+//  Operation Queue for inapp threading
+let operationQueue = OperationQueue()
+
 struct ContentView: View {
 //  URL TextField
     @State var input = ""
@@ -148,28 +151,8 @@ struct ContentView: View {
 //                      Hides the keyboard
                         hideKeyboard()
                         
-//                      Formats the URL trimming whitespaces and lowercases it
-                        let url = input.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-                        
-//                      If the URL is correctly given
-                        if !url.isEmpty {
-//                          Fetch the HTML at the given url. If it returns `nil`, default value is ""
-                            let html = fetchHTML(at: url) ?? ""
-//                          If the URL is incorrect (the fetch returned `nil`)
-                            if html == "" {
-//                              Show the incorrect URL Alert
-                                incorrectUrlAlert.toggle()
-                            } else {
-//                              Add the URL to the list of saved URLs and synchronize storage
-                                urls.append(url)
-                                userDefaults.set(urls, forKey: urlsKey)
-//                              Add the HTML to the list of fetched HTMLs and synchronize storage
-                                htmls.append(html)
-                                userDefaults.set(htmls, forKey: htmlsKey)
-                            }
-                        }
-//                      Resets the URL TextField
-                        input = ""
+//                      Tries to add the given URL into the List
+                        operationQueue.addOperation {self.addURL()}
                     }.alert(isPresented: $incorrectUrlAlert) {
 //                      Incorrect URL Alert
                         Alert(title: Text("URL errato"), message: Text("L'URL fornito non sembra corrispondere a un URL valido. Controlla che l'URL sia giusto e che tu sia connesso a internet."), dismissButton: .default(Text("Ok")))
@@ -179,7 +162,7 @@ struct ContentView: View {
                 Section(header: Text("CONTROLLO IN CORSO")) {
 //                  Button that checks changes between current HTML and last stored HTML
                     Button("Controlla modifiche") {
-                        checkChangesInApp()
+                        operationQueue.addOperation {self.checkChangesInApp()}
                     }.alert(isPresented: $changedUrlAlert, content: {
 //                      Changed URL or URLs Alert
                         Alert(title: Text("La pagina è cambiata"), message: Text("La pagina \(changedUrl) è cambiata."), dismissButton: .default(Text("Ok")))
