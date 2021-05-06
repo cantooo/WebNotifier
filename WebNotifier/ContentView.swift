@@ -31,6 +31,8 @@ struct ContentView: View {
     @State var URLAlreadyInListAlert = false
 //  Changed URL Alert trigger
     @State var changedUrlAlert = false
+//  No URL changed Alert trigger
+    @State var noUrlChangedAlert = false
 //  The changed URL or URLs
     @State var changedUrl = ""
     
@@ -122,6 +124,9 @@ struct ContentView: View {
         if changedUrl != "" {
             changedUrl.popLast()
             changedUrl.popLast()
+        } else {
+//      Else it notifies the user about no URL changed
+            noUrlChangedAlert.toggle()
         }
     }
     
@@ -210,7 +215,9 @@ struct ContentView: View {
                             htmls.remove(atOffsets: indexSet)
                             userDefaults.set(htmls, forKey: htmlsKey)
                         })
-                    }
+                    }.alert(isPresented: $noUrlChangedAlert, content: {
+                        Alert(title: Text("Nessuna modifica"), message: Text("Ho controllato gli URL e non ho trovato modifiche alle pagine web."), dismissButton: .default(Text("Ok")))
+                    })
                 }
             })
 //          Bold title on top
