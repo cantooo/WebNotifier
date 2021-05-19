@@ -147,12 +147,18 @@ struct ContentView: View {
 //                          Incorrect URL Alert
                             Alert(title: Text("URL errato"), message: Text("L'URL fornito non sembra corrispondere a un URL valido. Controlla che l'URL sia giusto e che tu sia connesso a internet."), dismissButton: .default(Text("Ok")))
                         }
-                    Button("Inizia a controllare") {
+                    Button {
 //                      Hides the keyboard
                         hideKeyboard()
                         
 //                      Tries to add the given URL into the List
                         operationQueue.addOperation {self.addURL()}
+                    } label: {
+                        HStack{
+                            Text("Inizia a controllare")
+                            Spacer()
+                            Label("", systemImage: "link.badge.plus")
+                        }
                     }.alert(isPresented: $URLAlreadyInListAlert) {
                         Alert(title: Text("URL già inserito"), message: Text("L'URL fornito è già nella lista."), dismissButton: .default(Text("Ok")))
                     }
@@ -160,8 +166,14 @@ struct ContentView: View {
 //              Second section
                 Section(header: Text("CONTROLLO IN CORSO")) {
 //                  Button that checks changes between current HTML and last stored HTML
-                    Button("Controlla modifiche") {
+                    Button {
                         operationQueue.addOperation {self.checkChangesInApp()}
+                    } label: {
+                        HStack{
+                            Text("Controlla modifiche")
+                            Spacer()
+                            Label("", systemImage: "network")
+                        }
                     }.alert(isPresented: $changedUrlAlert, content: {
 //                      Changed URL or URLs Alert
                         Alert(title: Text("La pagina è cambiata"), message: Text("La pagina \(changedUrl) è cambiata."), dismissButton: .default(Text("Ok")))
