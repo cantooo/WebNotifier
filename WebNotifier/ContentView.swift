@@ -130,27 +130,6 @@ struct ContentView: View {
         }
     }
     
-    func checkChanges() {
-//      For every element in urls
-        for i in 0..<urls.count {
-//          Sets the url
-            let url = urls[i]
-//          Sets the old HTML
-            let htmlOld = htmls[i]
-//          Fetch the HTML of the page
-            let htmlNew = fetchHTML(at: url) ?? ""
-            
-//          If the fetch did happen correctly and the webpage is changed
-            if htmlNew != "" && htmlNew != htmlOld {
-//              Saves the new HTML and synchronize storage
-                htmls[i] = htmlNew
-                userDefaults.set(htmls, forKey: htmlsKey)
-                
-                //NOTIFICA
-            }
-        }
-    }
-    
     var body: some View {
 //      For the bold title
         NavigationView(content: {
