@@ -114,20 +114,16 @@ struct ContentView: View {
                 htmls[i] = htmlNew
                 userDefaults.set(htmls, forKey: htmlsKey)
                 
-//              If not already set to `true`, show the changed URL Alert
-                if !changedUrlAlert {
-                    changedUrlAlert.toggle()
-                }
-                
 //              Adds this url to list of URLs that changed
                 changedUrl += "\(url), "
             }
         }
         
-//      If there is at least 1 changed URL, eliminates the ", " string at the end
+//      If there is at least 1 changed URL, eliminates the ", " string at the end. Then shows the changed URL alert
         if changedUrl != "" {
             changedUrl.popLast()
             changedUrl.popLast()
+            changedUrlAlert.toggle()
         } else {
 //      Else it notifies the user about no URL changed
             noUrlChangedAlert.toggle()
